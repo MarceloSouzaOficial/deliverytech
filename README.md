@@ -27,7 +27,7 @@ Sistema de delivery desenvolvido com Spring Boot e Java 21.
 - GET /h2-console - Console do banco H2
 
 ## 🔧 Configuração
-- Porta: 8080
+- Porta: 8081
 - Banco: H2 em memória
 - Profile: development
 
