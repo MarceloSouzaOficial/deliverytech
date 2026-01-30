@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,9 @@ import com.deliverytech.delivery_api.repository.RestauranteRepository;
 
 @Configuration
 public class DataLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
+
     @Bean
     public CommandLineRunner initData(
         ClienteRepository clienteRepository,
@@ -31,7 +36,7 @@ public class DataLoader {
         ItemPedidoRepository itemPedidoRepository
     ){
         return args ->{
-            System.out.println("Iniciando carregamento de dados...");
+            logger.info("Iniciando carregamento de dados...");
 
             Cliente cliente1 = new Cliente();
             cliente1.setNome("Raiel Landre");
@@ -130,7 +135,7 @@ public class DataLoader {
             itemPedidoRepository.save(item1);
             itemPedidoRepository.save(item2);
 
-            System.out.println("Dados carregados com sucesso!");
+            logger.info("Dados carregados com sucesso!");
 
         };
     }
