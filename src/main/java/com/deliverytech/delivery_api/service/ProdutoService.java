@@ -23,11 +23,20 @@ public class ProdutoService {
     private final RestauranteRepository restauranteRepository;
     private final ModelMapper mapper;
 
+    private ProdutoResponseDTO returnResponseDTO(Produto p){
+            ProdutoResponseDTO dto = mapper.map(p, ProdutoResponseDTO.class);
+            if(p.getRestaurante() != null){
+                dto.setRestauranteId(p.getRestaurante().getId());
+            }
+            return dto;
+    }
+
     public ProdutoService(ProdutoRepository produtoRepository, RestauranteRepository restauranteRepository, ModelMapper mapper) {
         this.produtoRepository = produtoRepository;
         this.restauranteRepository = restauranteRepository;
         this.mapper = mapper;
     }
+
 
     @Transactional
     public ProdutoResponseDTO cadastrar(Long restauranteId, ProdutoDTO produto){
@@ -47,10 +56,9 @@ public class ProdutoService {
         novoProduto.setRestaurante(restaurante);
         Produto salvo = produtoRepository.save(novoProduto);
 
-        ProdutoResponseDTO resposta = mapper.map(salvo, ProdutoResponseDTO.class);
-        resposta.setRestauranteId(restaurante.getId());
-        return resposta;
+        return returnResponseDTO(salvo);
     }
+
 
     public List<ProdutoResponseDTO> listarPorRestaurante(Long restauranteId){
         if(!restauranteRepository.existsById(restauranteId)){
@@ -60,18 +68,28 @@ public class ProdutoService {
         return produtoRepository.findByRestauranteIdAndDisponivelTrue(restauranteId)
             .stream()
             .map(produto -> {
-                ProdutoResponseDTO dto = mapper.map(produto, ProdutoResponseDTO.class);
-                dto.setRestauranteId(produto.getRestaurante().getId());
-                return dto;
+                return returnResponseDTO(produto);
             })
-            .toList();
+            .toList();       
     }
 
 
-
-    public Produto buscarPorId(Long id) {
-        return produtoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
+    public ProdutoResponseDTO buscarPorId(Long id) {
+        Produto p =  produtoRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+            return returnResponseDTO(p);
     }
+
+
+    public ProdutoResponseDTO toggleDisponibilidade(Long produtoId){
+        Produto produto = produtoRepository.findById(produtoId)
+        .orElseThrow(()-> new EntityNotFoundException("Produto não encontrado"));
+        produto.setDisponivel(!produto.isDisponivel());
+
+        Produto atualizado = produtoRepository.save(produto);
+
+        return returnResponseDTO(atualizado);
+    }
+
 
 }
