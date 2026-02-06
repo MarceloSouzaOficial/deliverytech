@@ -14,7 +14,18 @@ import com.deliverytech.delivery_api.model.Pedido;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
-    List<Pedido> findByClienteId(Long clienteId);
+
+
+    @Query("""
+        SELECT DISTINCT p     
+        FROM Pedido p
+        JOIN FETCH p.cliente
+        JOIN FETCH p.restaurante
+        LEFT JOIN FETCH p.itens i 
+        LEFT JOIN FETCH i.produto
+        WHERE p.cliente.id = :clienteId
+    """)
+    List<Pedido> buscarItensPorClientes(@Param("clienteId") Long clienteId);
 
     List<Pedido> findByStatus(StatusPedidos status);
 

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,9 +22,6 @@ import com.deliverytech.delivery_api.repository.RestauranteRepository;
 
 @Configuration
 public class DataLoader {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
-
     @Bean
     public CommandLineRunner initData(
         ClienteRepository clienteRepository,
@@ -36,7 +31,7 @@ public class DataLoader {
         ItemPedidoRepository itemPedidoRepository
     ){
         return args ->{
-            logger.info("Iniciando carregamento de dados...");
+            System.out.println("Iniciando carregamento de dados...");
 
             Cliente cliente1 = new Cliente();
             cliente1.setNome("Raiel Landre");
@@ -129,13 +124,30 @@ public class DataLoader {
             item2.setProduto(p1);
             item2.setPedido(pedido1);
             item2.setPrecoUnitario(p1.getPreco());
-            item2.setQuantidade(5);
+            item2.setQuantidade(2);
             item2.setSubtotal(p1.getPreco().multiply(BigDecimal.valueOf(item2.getQuantidade())));
+
+            ItemPedido item3 = new ItemPedido();
+            item3.setProduto(p2);
+            item3.setPedido(pedido1);
+            item3.setPrecoUnitario(p2.getPreco());
+            item3.setQuantidade(1);
+            item3.setSubtotal(p2.getPreco().multiply(BigDecimal.valueOf(item3.getQuantidade())));
             
             itemPedidoRepository.save(item1);
             itemPedidoRepository.save(item2);
+            itemPedidoRepository.save(item3);
 
-            logger.info("Dados carregados com sucesso!");
+            BigDecimal totalPedido1 = item2.getSubtotal().add(item3.getSubtotal());
+            pedido1.setValorTotal(totalPedido1);
+
+            BigDecimal totalPedido2 = item1.getSubtotal();
+            pedido2.setValorTotal(totalPedido2);
+
+            pedidoRepository.save(pedido1);
+            pedidoRepository.save(pedido2);
+
+            System.out.println("Dados carregados com sucesso!");
 
         };
     }

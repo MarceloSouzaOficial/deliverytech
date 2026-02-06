@@ -2,8 +2,6 @@ package com.deliverytech.delivery_api.dto.requests;
 
 import java.util.List;
 
-import com.deliverytech.delivery_api.model.ItemPedido;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,5 +22,5 @@ public class PedidoDTO {
 
     @Valid
     @NotNull
-    private List<ItemPedido> itens;
+    private List<ItemPedidoDTO> itens;
 }
