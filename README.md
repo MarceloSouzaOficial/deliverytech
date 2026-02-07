@@ -3,7 +3,7 @@ Sistema de delivery desenvolvido com Spring Boot e Java 21.
 
 ## 🚀 Tecnologias
 - **Java 21 LTS** (versão mais recente)
-- Spring Boot 3.2.x
+ - Spring Boot 3.3.x
 - Spring Web
 - Spring Data JPA
 - H2 Database
@@ -22,7 +22,7 @@ Sistema de delivery desenvolvido com Spring Boot e Java 21.
 4. Acesse: http://localhost:8081/health
 
 ## 📋 Endpoints
-- GET /health - Status da aplicação (inclui versão Java)
+- GET /health - Status da aplicação (Health Check)
 - GET /info - Informações da aplicação
 - GET /h2-console - Console do banco H2
 
@@ -33,4 +33,4 @@ Sistema de delivery desenvolvido com Spring Boot e Java 21.
 
 ## 👨‍💻 Desenvolvedor
 [ Marcelo Souza] - [TURMA: TI2602 03731 B - Arquitetura de sistema]
-Desenvolvido com JDK 21 e Spring Boot 3.2.x
+Desenvolvido com JDK 21 e Spring Boot 3.3.x
