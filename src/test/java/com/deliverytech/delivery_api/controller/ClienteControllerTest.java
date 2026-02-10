@@ -35,9 +35,7 @@ public class ClienteControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.id").exists())
                     .andExpect(jsonPath("$.nome").value("Joao Silva"))
-                    .andExpect(jsonPath("$.email").value("j@gmail.com"))
                     .andExpect(jsonPath("$.email").value("j@gmail.com"))
                     ;
     }

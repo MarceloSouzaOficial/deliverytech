@@ -1,20 +1,27 @@
 package com.deliverytech.delivery_api.controller;
 
-import java.util.List;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.deliverytech.delivery_api.dto.requests.ClienteDTO;
 import com.deliverytech.delivery_api.dto.responses.ClienteResponseDTO;
+import com.deliverytech.delivery_api.dto.responses.PagedResponse;
 import com.deliverytech.delivery_api.service.ClienteService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,9 +31,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 
-
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping(
+    value = "/clientes",
+    produces = "application/json"
+)
+@CrossOrigin(origins = "*")
 @Tag(name = "Clientes", description = "Endpoints para gerenciamento de clientes.")
 public class ClienteController {
 
@@ -45,20 +55,37 @@ public class ClienteController {
                 }
     )
     @PostMapping
-    public ResponseEntity<ClienteResponseDTO> cadastrar(@Valid @RequestBody ClienteDTO cliente){
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrar(cliente));
+    public ResponseEntity<com.deliverytech.delivery_api.dto.responses.ApiResponse<ClienteResponseDTO>> cadastrar(@Valid @RequestBody ClienteDTO cliente){
+        ClienteResponseDTO response = service.cadastrar(cliente);
+
+        URI location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(response.getId())
+            .toUri();
+
+        return ResponseEntity.created(location).header("Content-Type", "application/json").body(new com.deliverytech.delivery_api.dto.responses.ApiResponse<>(response));
     }
 
-    @Operation(summary="Listar clientes ativos.")
+    @Operation(summary="Listar clientes ativos (paginado).")
     @ApiResponses(
         value={
             @ApiResponse(responseCode="200", description="Lista de clientes ativos retornado com sucesso."),
             @ApiResponse(responseCode="404", description="Cliente não encontrado."),
         }
     )
-    @GetMapping("/listar")
-    public List<ClienteResponseDTO> listar() {
-        return service.listarAtivos();
+    @GetMapping
+    public ResponseEntity<PagedResponse<ClienteResponseDTO>> listar(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ){ 
+        Pageable pageable = PageRequest.of(page, size);
+        var pageResult =  service.listarAtivos(pageable);
+        var response = new PagedResponse<>(pageResult);
+        return ResponseEntity.ok()
+        .header("Content-Type", "application/json")
+        .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
+        .body(response);
     }
 
     @Operation(summary="Buscar cliente por Id.")
@@ -69,8 +96,9 @@ public class ClienteController {
         }
     )
     @GetMapping("/{id}")
-    public ClienteResponseDTO buscar(@PathVariable Long id){
-        return service.buscarPorId(id);
+    public ResponseEntity<com.deliverytech.delivery_api.dto.responses.ApiResponse<ClienteResponseDTO>> buscar(@PathVariable Long id){
+        
+        return ResponseEntity.ok().header("Content-Type", "application/json").body(new com.deliverytech.delivery_api.dto.responses.ApiResponse<>(service.buscarPorId(id)));
     }
 
 /*     @PutMapping("/{id}")
@@ -87,8 +115,8 @@ public class ClienteController {
         }
     )
     @PatchMapping("/{id}/toggle")
-    public ResponseEntity<ClienteResponseDTO> toggleAtivo(@PathVariable Long id){
-        return ResponseEntity.ok(service.toggleAtivo(id));
+    public ResponseEntity<com.deliverytech.delivery_api.dto.responses.ApiResponse<ClienteResponseDTO>> toggleAtivo(@PathVariable Long id){
+        return ResponseEntity.ok().header("Content-Type", "application/json").body(new com.deliverytech.delivery_api.dto.responses.ApiResponse<>(service.toggleAtivo(id)));
     }    
 
 }

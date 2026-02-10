@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.deliverytech.delivery_api.dto.requests.ClienteDTO;
@@ -49,11 +51,9 @@ public class ClienteService {
 
 
 
-    public List<ClienteResponseDTO> listarAtivos(){
-        return repository.findByAtivoTrue()
-        .stream()
-        .map(clientes -> mapper.map(clientes, ClienteResponseDTO.class))
-        .toList();
+    public Page<ClienteResponseDTO> listarAtivos(Pageable pageable){
+        return repository.findByAtivoTrue(pageable)
+        .map(clientes -> mapper.map(clientes, ClienteResponseDTO.class));
     }
 
 
